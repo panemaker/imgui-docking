@@ -3755,6 +3755,7 @@ struct ImGuiPlatformIO
 
     // Platform Backend functions (e.g. Win32, GLFW, SDL) ------------------- Called by -----
     void    (*Platform_CreateWindow)(ImGuiViewport* vp);                    // . . U . .  // Create a new platform window for the given viewport
+    void    (*Platform_PostWindowCreation)(ImGuiViewport* vp);              // . . U . .  // (Optional) Custom callback after a window is created
     void    (*Platform_DestroyWindow)(ImGuiViewport* vp);                   // N . U . D  //
     void    (*Platform_ShowWindow)(ImGuiViewport* vp);                      // . . U . .  // Newly created windows are initially hidden so SetWindowPos/Size/Title can be called on them before showing the window
     void    (*Platform_SetWindowPos)(ImGuiViewport* vp, ImVec2 pos);        // . . U . .  // Set platform window position (given the upper-left corner of client area)

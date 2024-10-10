@@ -16339,6 +16339,8 @@ void ImGui::UpdatePlatformWindows()
             g.PlatformIO.Platform_CreateWindow(viewport);
             if (g.PlatformIO.Renderer_CreateWindow != NULL)
                 g.PlatformIO.Renderer_CreateWindow(viewport);
+            if (g.PlatformIO.Platform_PostWindowCreation != NULL)
+                g.PlatformIO.Platform_PostWindowCreation(viewport);
             g.PlatformWindowsCreatedCount++;
             viewport->LastNameHash = 0;
             viewport->LastPlatformPos = viewport->LastPlatformSize = ImVec2(FLT_MAX, FLT_MAX); // By clearing those we'll enforce a call to Platform_SetWindowPos/Size below, before Platform_ShowWindow (FIXME: Is that necessary?)
