@@ -1441,6 +1441,7 @@ ImGuiIO::ImGuiIO()
     ConfigDragClickToInputText = false;
     ConfigWindowsResizeFromEdges = true;
     ConfigWindowsMoveFromTitleBarOnly = false;
+    ConfigCustomTitleBar = false;
     ConfigScrollbarScrollByPage = true;
     ConfigMemoryCompactTimer = 60.0f;
     ConfigDebugIsDebuggerPresent = false;
@@ -18026,6 +18027,10 @@ static void ImGui::DockNodeUpdate(ImGuiDockNode* node)
             window_flags |= ImGuiWindowFlags_NoFocusOnAppearing;
             window_flags |= ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoNavFocus | ImGuiWindowFlags_NoCollapse;
             window_flags |= ImGuiWindowFlags_NoTitleBar;
+            if (ImGui::GetIO().ConfigCustomTitleBar)
+            {
+                window_flags |= ImGuiWindowFlags_NoResize;
+            }
 
             SetNextWindowBgAlpha(0.0f); // Don't set ImGuiWindowFlags_NoBackground because it disables borders
             PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
