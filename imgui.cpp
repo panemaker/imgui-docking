@@ -15805,7 +15805,7 @@ static void ImGui::UpdateViewportsNewFrame()
         main_viewport_pos = main_viewport->Pos;    // Preserve last pos/size when minimized (FIXME: We don't do the same for Size outside of the viewport path)
         main_viewport_size = main_viewport->Size;
     }
-    AddUpdateViewport(NULL, IMGUI_VIEWPORT_DEFAULT_ID, main_viewport_pos, main_viewport_size, ImGuiViewportFlags_OwnedByApp | ImGuiViewportFlags_CanHostOtherWindows);
+    AddUpdateViewport(NULL, IMGUI_VIEWPORT_DEFAULT_ID, main_viewport_pos, main_viewport_size, ImGuiViewportFlags_OwnedByApp /*| ImGuiViewportFlags_CanHostOtherWindows*/);
 
     g.CurrentDpiScale = 0.0f;
     g.CurrentViewport = NULL;
@@ -18029,7 +18029,7 @@ static void ImGui::DockNodeUpdate(ImGuiDockNode* node)
             window_flags |= ImGuiWindowFlags_NoTitleBar;
             if (ImGui::GetIO().ConfigCustomTitleBar)
             {
-                window_flags |= ImGuiWindowFlags_NoResize;
+                //window_flags |= ImGuiWindowFlags_NoMove;
             }
 
             SetNextWindowBgAlpha(0.0f); // Don't set ImGuiWindowFlags_NoBackground because it disables borders
