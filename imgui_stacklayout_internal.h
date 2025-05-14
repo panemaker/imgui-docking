@@ -13,6 +13,7 @@ Index of this file:
 #include "imgui_internal.h"
 #include "imgui_stacklayout.h"
 
+#if IMGUI_HAS_STACK_LAYOUT
 #ifndef IMGUI_DISABLE
 
 //-----------------------------------------------------------------------------
@@ -26,5 +27,5 @@ namespace ImGuiInternal
 
 } // namespace ImGuiInternal
 
-
 #endif // #ifndef IMGUI_DISABLE
+#endif // IMGUI_HAS_STACK_LAYOUT
