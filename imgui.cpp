@@ -17570,14 +17570,15 @@ static void ImGui::DockNodeRemoveWindow(ImGuiDockNode* node, ImGuiWindow* window
             DockNodeRemoveTabBar(node);
     }
 
-    if (node->Windows.Size == 0 && !node->IsCentralNode() && !node->IsDockSpace() && window->DockId != node->ID)
+    // Ignore the IsCentralNode so we automatically refill the central node
+    if (node->Windows.Size == 0 /*&& !node->IsCentralNode()*/ && !node->IsDockSpace() && window->DockId != node->ID)
     {
         // Automatic dock node delete themselves if they are not holding at least one tab
         DockContextRemoveNode(&g, node, true);
         return;
     }
 
-    if (node->Windows.Size == 1 && !node->IsCentralNode() && node->HostWindow)
+    if (node->Windows.Size == 1 /*&& !node->IsCentralNode()*/ && node->HostWindow)
     {
         ImGuiWindow* remaining_window = node->Windows[0];
         // Note: we used to transport viewport ownership here.
