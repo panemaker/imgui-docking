@@ -16,7 +16,7 @@ Businesses: support continued development and maintenance via invoiced sponsorin
 | [The Pitch](#the-pitch) - [Usage](#usage) - [How it works](#how-it-works) - [Releases & Changelogs](#releases--changelogs) - [Demo](#demo) - [Getting Started & Integration](#getting-started--integration) |
 :----------------------------------------------------------: |
 | [Gallery](#gallery) - [Support, FAQ](#support-frequently-asked-questions-faq) -  [How to help](#how-to-help) - **[Funding & Sponsors](https://github.com/ocornut/imgui/wiki/Funding)** - [Credits](#credits) - [License](#license) |
-| [Wiki](https://github.com/ocornut/imgui/wiki) - [Extensions](https://github.com/ocornut/imgui/wiki/Useful-Extensions) - [Languages bindings & frameworks backends](https://github.com/ocornut/imgui/wiki/Bindings) - [Software using Dear ImGui](https://github.com/ocornut/imgui/wiki/Software-using-dear-imgui) - [User quotes](https://github.com/ocornut/imgui/wiki/Quotes) |
+| [Wiki](https://github.com/ocornut/imgui/wiki) - [Extensions](https://github.com/ocornut/imgui/wiki/Useful-Extensions) - [Language bindings & framework backends](https://github.com/ocornut/imgui/wiki/Bindings) - [Software using Dear ImGui](https://github.com/ocornut/imgui/wiki/Software-using-dear-imgui) - [User quotes](https://github.com/ocornut/imgui/wiki/Quotes) |
 
 ### The Pitch
 
@@ -110,7 +110,7 @@ Reading the changelogs is a good way to keep up to date with the things Dear ImG
 Calling the `ImGui::ShowDemoWindow()` function will create a demo window showcasing a variety of features and examples. The code is always available for reference in `imgui_demo.cpp`. [Here's how the demo looks](https://raw.githubusercontent.com/wiki/ocornut/imgui/web/v167/v167-misc.png).
 
 You should be able to build the examples from sources. If you don't, let us know! If you want to have a quick look at some Dear ImGui features, you can download Windows binaries of the demo app here:
-- [imgui-demo-binaries-20241211.zip](https://www.dearimgui.com/binaries/imgui-demo-binaries-20241211.zip) (Windows, 1.91.6, built 2024/11/11, master) or [older binaries](https://www.dearimgui.com/binaries).
+- [imgui-demo-binaries-20250625.zip](https://www.dearimgui.com/binaries/imgui-demo-binaries-20250625.zip) (Windows, 1.92.0, built 2025/06/25, master) or [older binaries](https://www.dearimgui.com/binaries).
 
 The demo applications are not DPI aware so expect some blurriness on a 4K screen. For DPI awareness in your application, you can load/reload your font at a different scale and scale your style with `style.ScaleAllSizes()` (see [FAQ](https://www.dearimgui.com/faq)).
 
