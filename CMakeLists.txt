@@ -9,6 +9,8 @@ add_library(imgui "${IMGUI_SOURCE_DIR}/backends/imgui_impl_glfw.h"
                  "${IMGUI_SOURCE_DIR}/backends/imgui_impl_opengl3_loader.h"
                  "${IMGUI_SOURCE_DIR}/misc/cpp/imgui_stdlib.h"
                  "${IMGUI_SOURCE_DIR}/misc/cpp/imgui_stdlib.cpp"
+                 "${IMGUI_SOURCE_DIR}/misc/freetype/imgui_freetype.h"
+                 "${IMGUI_SOURCE_DIR}/misc/freetype/imgui_freetype.cpp"
                  "${IMGUI_SOURCE_DIR}/imconfig.h"
                  "${IMGUI_SOURCE_DIR}/imgui.h"
                  "${IMGUI_SOURCE_DIR}/imgui.cpp"
@@ -29,6 +31,8 @@ set(includes
     "${CMAKE_CURRENT_SOURCE_DIR}"
     "${CMAKE_CURRENT_SOURCE_DIR}/backends"
     "${CMAKE_CURRENT_SOURCE_DIR}/misc/cpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/misc/freetype"
+    "${CMAKE_SOURCE_DIR}/external/freetype/include"
 )
 
 target_link_libraries(imgui PRIVATE glfw)
