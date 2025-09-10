@@ -220,6 +220,7 @@ struct ImGuiWindowClass;            // Window class (rare/advanced uses: provide
 enum ImGuiDir : int;                // -> enum ImGuiDir              // Enum: A cardinal direction (Left, Right, Up, Down)
 enum ImGuiKey : int;                // -> enum ImGuiKey              // Enum: A key identifier (ImGuiKey_XXX or ImGuiMod_XXX value)
 enum ImGuiMouseSource : int;        // -> enum ImGuiMouseSource      // Enum; A mouse input source identifier (Mouse, TouchScreen, Pen)
+enum ImGuiControlButton : ImU8;     // -> enum ImGuiControlButton    // Enum: A control button identifier for window (minimize, maximize, close)
 enum ImGuiSortDirection : ImU8;     // -> enum ImGuiSortDirection    // Enum: A sorting direction (ascending or descending)
 typedef int ImGuiCol;               // -> enum ImGuiCol_             // Enum: A color identifier for styling
 typedef int ImGuiCond;              // -> enum ImGuiCond_            // Enum: A condition for many Set*() functions
@@ -1568,6 +1569,14 @@ enum ImGuiDir : int
     ImGuiDir_Up      = 2,
     ImGuiDir_Down    = 3,
     ImGuiDir_COUNT
+};
+
+// A control button type
+enum ImGuiControlButton : ImU8
+{
+    ImGuiControlButton_Minimize = 0,
+    ImGuiControlButton_Maximize = 1,
+    ImGuiControlButton_Close = 2
 };
 
 // A sorting direction

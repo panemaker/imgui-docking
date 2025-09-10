@@ -7455,7 +7455,7 @@ void ImGui::RenderWindowTitleBarContents(ImGuiWindow* window, const ImRect& titl
     if (has_close_button)
     {
         g.CurrentItemFlags |= ImGuiItemFlags_NoFocus;
-        if (CloseButton(window->GetID("#CLOSE"), close_button_pos))
+        if (ControlButton(window->GetID("#CLOSE"), close_button_pos, ImGuiControlButton_Close))
             *p_open = false;
         g.CurrentItemFlags &= ~ImGuiItemFlags_NoFocus;
     }
@@ -17356,7 +17356,7 @@ namespace ImGui
     static bool             DockNodeIsDropAllowed(ImGuiWindow* host_window, ImGuiWindow* payload_window);
     static void             DockNodePreviewDockSetup(ImGuiWindow* host_window, ImGuiDockNode* host_node, ImGuiWindow* payload_window, ImGuiDockNode* payload_node, ImGuiDockPreviewData* preview_data, bool is_explicit_target, bool is_outer_docking);
     static void             DockNodePreviewDockRender(ImGuiWindow* host_window, ImGuiDockNode* host_node, ImGuiWindow* payload_window, const ImGuiDockPreviewData* preview_data);
-    static void             DockNodeCalcTabBarLayout(const ImGuiDockNode* node, ImRect* out_title_rect, ImRect* out_tab_bar_rect, ImVec2* out_window_menu_button_pos, ImVec2* out_close_button_pos);
+    static void             DockNodeCalcTabBarLayout(const ImGuiDockNode* node, ImRect* out_title_rect, ImRect* out_tab_bar_rect, ImVec2* out_window_menu_button_pos, ImVec2* out_close_button_pos, ImVec2* out_minimize_button_pos, ImVec2* out_maximize_button_pos);
     static void             DockNodeCalcSplitRects(ImVec2& pos_old, ImVec2& size_old, ImVec2& pos_new, ImVec2& size_new, ImGuiDir dir, ImVec2 size_new_desired);
     static bool             DockNodeCalcDropRectsAndTestMousePos(const ImRect& parent, ImGuiDir dir, ImRect& out_draw, bool outer_docking, ImVec2* test_mouse_pos);
     static const char*      DockNodeGetHostWindowTitle(ImGuiDockNode* node, char* buf, int buf_size) { ImFormatString(buf, buf_size, "##DockNode_%02X", node->ID); return buf; }
@@ -18938,6 +18938,20 @@ static bool IsDockNodeTitleBarHighlighted(ImGuiDockNode* node, ImGuiDockNode* ro
     return false;
 }
 
+void NodeWantCloseAll(ImGuiDockNode* node)
+{
+    if (!node)
+        return;
+
+    node->WantCloseAll = true;
+
+    if (node->IsSplitNode())
+    {
+        NodeWantCloseAll(node->ChildNodes[0]);
+        NodeWantCloseAll(node->ChildNodes[1]);
+    }
+}
+
 // Submit the tab bar corresponding to a dock node and various housekeeping details.
 static void ImGui::DockNodeUpdateTabBar(ImGuiDockNode* node, ImGuiWindow* host_window)
 {
@@ -19013,7 +19027,9 @@ static void ImGui::DockNodeUpdateTabBar(ImGuiDockNode* node, ImGuiWindow* host_w
     ImRect title_bar_rect, tab_bar_rect;
     ImVec2 window_menu_button_pos;
     ImVec2 close_button_pos;
-    DockNodeCalcTabBarLayout(node, &title_bar_rect, &tab_bar_rect, &window_menu_button_pos, &close_button_pos);
+    ImVec2 minimize_button_pos;
+    ImVec2 maximize_button_pos;
+    DockNodeCalcTabBarLayout(node, &title_bar_rect, &tab_bar_rect, &window_menu_button_pos, &close_button_pos, &minimize_button_pos, &maximize_button_pos);
 
     // Submit new tabs, they will be added as Unsorted and sorted below based on relative DockOrder value.
     const int tabs_count_old = tab_bar->Tabs.Size;
@@ -19126,6 +19142,7 @@ static void ImGui::DockNodeUpdateTabBar(ImGuiDockNode* node, ImGuiWindow* host_w
         if (g.NavWindow && g.NavWindow->RootWindow == window && (window->DC.NavLayersActiveMask & (1 << ImGuiNavLayer_Menu)) == 0)
             host_window->NavLastIds[1] = window->TabId;
     }
+    TabItemEx(tab_bar, "+", NULL, ImGuiTabItemFlags_Trailing | ImGuiTabItemFlags_Button | ImGuiTabItemFlags_NoReorder, NULL);
 
     // Restore style colors
     for (int color_n = 0; color_n < ImGuiWindowDockStyleCol_COUNT; color_n++)
@@ -19148,9 +19165,17 @@ static void ImGui::DockNodeUpdateTabBar(ImGuiDockNode* node, ImGuiWindow* host_w
             PushItemFlag(ImGuiItemFlags_Disabled, true);
             PushStyleColor(ImGuiCol_Text, style.Colors[ImGuiCol_Text] * ImVec4(1.0f,1.0f,1.0f,0.4f));
         }
-        if (CloseButton(host_window->GetID("#CLOSE"), close_button_pos))
+        if (ControlButton(host_window->GetID("#MINIMIZE"), minimize_button_pos, ImGuiControlButton::ImGuiControlButton_Minimize))
         {
-            node->WantCloseAll = true;
+
+        }
+        if (ControlButton(host_window->GetID("#MAXIMIZE"), maximize_button_pos, ImGuiControlButton::ImGuiControlButton_Maximize))
+        {
+
+        }
+        if (ControlButton(host_window->GetID("#CLOSE"), close_button_pos, ImGuiControlButton::ImGuiControlButton_Close))
+        {
+            NodeWantCloseAll(ImGui::DockNodeGetRootNode(node));
             for (int n = 0; n < tab_bar->Tabs.Size; n++)
                 TabBarCloseTab(tab_bar, &tab_bar->Tabs[n]);
         }
@@ -19280,7 +19305,7 @@ static bool ImGui::DockNodeIsDropAllowed(ImGuiWindow* host_window, ImGuiWindow* 
 
 // window menu button == collapse button when not in a dock node.
 // FIXME: This is similar to RenderWindowTitleBarContents(), may want to share code.
-static void ImGui::DockNodeCalcTabBarLayout(const ImGuiDockNode* node, ImRect* out_title_rect, ImRect* out_tab_bar_rect, ImVec2* out_window_menu_button_pos, ImVec2* out_close_button_pos)
+static void ImGui::DockNodeCalcTabBarLayout(const ImGuiDockNode* node, ImRect* out_title_rect, ImRect* out_tab_bar_rect, ImVec2* out_window_menu_button_pos, ImVec2* out_close_button_pos, ImVec2* out_minimize_button_pos, ImVec2* out_maximize_button_pos)
 {
     ImGuiContext& g = *GImGui;
     ImGuiStyle& style = g.Style;
@@ -19298,6 +19323,10 @@ static void ImGui::DockNodeCalcTabBarLayout(const ImGuiDockNode* node, ImRect* o
     if (node->HasCloseButton)
     {
         if (out_close_button_pos) *out_close_button_pos = ImVec2(r.Max.x - button_sz, r.Min.y + style.FramePadding.y);
+        r.Max.x -= button_sz + style.ItemInnerSpacing.x;
+        if (out_maximize_button_pos) *out_maximize_button_pos = ImVec2(r.Max.x - button_sz, r.Min.y + style.FramePadding.y);
+        r.Max.x -= button_sz + style.ItemInnerSpacing.x;
+        if (out_minimize_button_pos) *out_minimize_button_pos = ImVec2(r.Max.x - button_sz, r.Min.y + style.FramePadding.y);
         r.Max.x -= button_sz + style.ItemInnerSpacing.x;
     }
     if (node->HasWindowMenuButton && style.WindowMenuButtonPosition == ImGuiDir_Left)
@@ -19526,7 +19555,7 @@ static void ImGui::DockNodePreviewDockRender(ImGuiWindow* host_window, ImGuiDock
     {
         // Compute target tab bar geometry so we can locate our preview tabs
         ImRect tab_bar_rect;
-        DockNodeCalcTabBarLayout(&data->FutureNode, NULL, &tab_bar_rect, NULL, NULL);
+        DockNodeCalcTabBarLayout(&data->FutureNode, NULL, &tab_bar_rect, NULL, NULL, NULL, NULL);
         ImVec2 tab_pos = tab_bar_rect.Min;
         if (host_node && host_node->TabBar)
         {
