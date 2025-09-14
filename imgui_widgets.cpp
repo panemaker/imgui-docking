@@ -883,7 +883,7 @@ bool ImGui::ArrowButton(const char* str_id, ImGuiDir dir)
 }
 
 // Button to control window (minimize, maximize, close)
-bool ImGui::ControlButton(ImGuiID id, const ImVec2& pos, ImGuiControlButton controlButtonType)
+bool ImGui::ControlButton(ImGuiID id, const ImVec2& pos, ImGuiControlButton controlButtonType, bool* outHovered)
 {
     ImGuiContext& g = *GImGui;
     ImGuiWindow* window = g.CurrentWindow;
@@ -902,6 +902,8 @@ bool ImGui::ControlButton(ImGuiID id, const ImVec2& pos, ImGuiControlButton cont
 
     bool hovered, held;
     bool pressed = ButtonBehavior(bb_interact, id, &hovered, &held);
+    if (outHovered)
+        *outHovered = hovered;
     if (is_clipped)
         return pressed;
 
@@ -918,7 +920,7 @@ bool ImGui::ControlButton(ImGuiID id, const ImVec2& pos, ImGuiControlButton cont
         const ImU32 dash_col = GetColorU32(ImGuiCol_Text);
         const ImVec2 dash_center = bb.GetCenter() - ImVec2(0.5f, 0.5f);
         const float dash_extent = g.FontSize * 0.25f;
-        const float dash_thickness = 1.0f; // FIXME-DPI
+        const float dash_thickness = 1.2f; // FIXME-DPI
         window->DrawList->AddLine(dash_center + ImVec2(-dash_extent, 0.0f), dash_center + ImVec2(+dash_extent, 0.0f), dash_col, dash_thickness);
         break;
     }

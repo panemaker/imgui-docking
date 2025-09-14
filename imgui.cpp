@@ -18753,7 +18753,7 @@ static void ImGui::DockNodeUpdate(ImGuiDockNode* node)
             window_flags |= ImGuiWindowFlags_NoTitleBar;
             if (ImGui::GetIO().ConfigCustomTitleBar)
             {
-                //window_flags |= ImGuiWindowFlags_NoMove;
+                window_flags |= ImGuiWindowFlags_NoResize;
             }
 
             SetNextWindowBgAlpha(0.0f); // Don't set ImGuiWindowFlags_NoBackground because it disables borders
@@ -19016,20 +19016,6 @@ static bool IsDockNodeTitleBarHighlighted(ImGuiDockNode* node, ImGuiDockNode* ro
     return false;
 }
 
-void NodeWantCloseAll(ImGuiDockNode* node)
-{
-    if (!node)
-        return;
-
-    node->WantCloseAll = true;
-
-    if (node->IsSplitNode())
-    {
-        NodeWantCloseAll(node->ChildNodes[0]);
-        NodeWantCloseAll(node->ChildNodes[1]);
-    }
-}
-
 // Submit the tab bar corresponding to a dock node and various housekeeping details.
 static void ImGui::DockNodeUpdateTabBar(ImGuiDockNode* node, ImGuiWindow* host_window)
 {
@@ -19221,7 +19207,6 @@ static void ImGui::DockNodeUpdateTabBar(ImGuiDockNode* node, ImGuiWindow* host_w
         if (g.NavWindow && g.NavWindow->RootWindow == window && (window->DC.NavLayersActiveMask & (1 << ImGuiNavLayer_Menu)) == 0)
             host_window->NavLastIds[1] = window->TabId;
     }
-    TabItemEx(tab_bar, "+", NULL, ImGuiTabItemFlags_Trailing | ImGuiTabItemFlags_Button | ImGuiTabItemFlags_NoReorder, NULL);
 
     // Restore style colors
     for (int color_n = 0; color_n < ImGuiWindowDockStyleCol_COUNT; color_n++)
@@ -19244,20 +19229,24 @@ static void ImGui::DockNodeUpdateTabBar(ImGuiDockNode* node, ImGuiWindow* host_w
             PushItemFlag(ImGuiItemFlags_Disabled, true);
             PushStyleColor(ImGuiCol_Text, style.Colors[ImGuiCol_Text] * ImVec4(1.0f,1.0f,1.0f,0.4f));
         }
-        if (ControlButton(host_window->GetID("#MINIMIZE"), minimize_button_pos, ImGuiControlButton::ImGuiControlButton_Minimize))
+        auto updateControlButton = [](ImGuiDockNode* node, ImGuiWindow* host_window, ImVec2 pos, ImGuiControlButton buttonType, const char* label)
         {
+                ImGuiContext& g = *GImGui;
+                bool hovered = false;
+                bool pressed = false;
+                pressed = ControlButton(host_window->GetID(label), pos, buttonType, &hovered);
+                if (hovered || pressed)
+                {
+                    g.DockContext.Control = buttonType;
+                    g.DockContext.ControlNodeID = node->ID;
+                    g.DockContext.ControlClicked = pressed;
+                    g.DockContext.ControlHovered = hovered;
+        }
+            };
+        updateControlButton(node, host_window, minimize_button_pos, ImGuiControlButton::ImGuiControlButton_Minimize, "#MINIMIZE");
+        updateControlButton(node, host_window, maximize_button_pos, ImGuiControlButton::ImGuiControlButton_Maximize, "#MAXIMIZE");
+        updateControlButton(node, host_window, close_button_pos, ImGuiControlButton::ImGuiControlButton_Close, "#CLOSE");
 
-        }
-        if (ControlButton(host_window->GetID("#MAXIMIZE"), maximize_button_pos, ImGuiControlButton::ImGuiControlButton_Maximize))
-        {
-
-        }
-        if (ControlButton(host_window->GetID("#CLOSE"), close_button_pos, ImGuiControlButton::ImGuiControlButton_Close))
-        {
-            NodeWantCloseAll(ImGui::DockNodeGetRootNode(node));
-            for (int n = 0; n < tab_bar->Tabs.Size; n++)
-                TabBarCloseTab(tab_bar, &tab_bar->Tabs[n]);
-        }
         //if (IsItemActive())
         //    focus_tab_id = tab_bar->SelectedTabId;
         if (!close_button_is_enabled)
