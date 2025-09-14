@@ -19157,7 +19157,7 @@ static void ImGui::DockNodeUpdateTabBar(ImGuiDockNode* node, ImGuiWindow* host_w
     // Begin tab bar
     ImGuiTabBarFlags tab_bar_flags = ImGuiTabBarFlags_Reorderable | ImGuiTabBarFlags_AutoSelectNewTabs; // | ImGuiTabBarFlags_NoTabListScrollingButtons);
     tab_bar_flags |= ImGuiTabBarFlags_SaveSettings | ImGuiTabBarFlags_DockNode;
-    tab_bar_flags |= ImGuiTabBarFlags_FittingPolicyMixed; // Enforce default policy. Since 1.92.2 this is now reasonable. May expose later if needed. (#8800, #3421)
+    tab_bar_flags |= ImGuiTabBarFlags_FittingPolicyShrink; // Enforce default policy. Since 1.92.2 this is now reasonable. May expose later if needed. (#8800, #3421)
     tab_bar_flags |= ImGuiTabBarFlags_DrawSelectedOverline;
     if (!host_window->Collapsed && is_focused)
         tab_bar_flags |= ImGuiTabBarFlags_IsFocused;
@@ -19230,7 +19230,7 @@ static void ImGui::DockNodeUpdateTabBar(ImGuiDockNode* node, ImGuiWindow* host_w
             PushStyleColor(ImGuiCol_Text, style.Colors[ImGuiCol_Text] * ImVec4(1.0f,1.0f,1.0f,0.4f));
         }
         auto updateControlButton = [](ImGuiDockNode* node, ImGuiWindow* host_window, ImVec2 pos, ImGuiControlButton buttonType, const char* label)
-        {
+            {
                 ImGuiContext& g = *GImGui;
                 bool hovered = false;
                 bool pressed = false;
@@ -19241,7 +19241,7 @@ static void ImGui::DockNodeUpdateTabBar(ImGuiDockNode* node, ImGuiWindow* host_w
                     g.DockContext.ControlNodeID = node->ID;
                     g.DockContext.ControlClicked = pressed;
                     g.DockContext.ControlHovered = hovered;
-        }
+                }
             };
         updateControlButton(node, host_window, minimize_button_pos, ImGuiControlButton::ImGuiControlButton_Minimize, "#MINIMIZE");
         updateControlButton(node, host_window, maximize_button_pos, ImGuiControlButton::ImGuiControlButton_Maximize, "#MAXIMIZE");

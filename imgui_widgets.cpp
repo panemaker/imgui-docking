@@ -938,12 +938,12 @@ bool ImGui::ControlButton(ImGuiID id, const ImVec2& pos, ImGuiControlButton cont
     }
     case ImGuiControlButton_Close:
     {
-        const ImU32 cross_col = GetColorU32(ImGuiCol_Text);
-        const ImVec2 cross_center = bb.GetCenter() - ImVec2(0.5f, 0.5f);
-        const float cross_extent = g.FontSize * 0.5f * 0.7071f - 1.0f;
-        const float cross_thickness = 1.0f; // FIXME-DPI
-        window->DrawList->AddLine(cross_center + ImVec2(+cross_extent, +cross_extent), cross_center + ImVec2(-cross_extent, -cross_extent), cross_col, cross_thickness);
-        window->DrawList->AddLine(cross_center + ImVec2(+cross_extent, -cross_extent), cross_center + ImVec2(-cross_extent, +cross_extent), cross_col, cross_thickness);
+    const ImU32 cross_col = GetColorU32(ImGuiCol_Text);
+    const ImVec2 cross_center = bb.GetCenter() - ImVec2(0.5f, 0.5f);
+    const float cross_extent = g.FontSize * 0.5f * 0.7071f - 1.0f;
+    const float cross_thickness = 1.0f; // FIXME-DPI
+    window->DrawList->AddLine(cross_center + ImVec2(+cross_extent, +cross_extent), cross_center + ImVec2(-cross_extent, -cross_extent), cross_col, cross_thickness);
+    window->DrawList->AddLine(cross_center + ImVec2(+cross_extent, -cross_extent), cross_center + ImVec2(-cross_extent, +cross_extent), cross_col, cross_thickness);
         break;
     }
     default:
@@ -1875,7 +1875,7 @@ void ImGui::ShrinkWidths(ImGuiShrinkWidthItem* items, int count, float width_exc
     if (count == 1)
     {
         if (items[0].Width >= 0.0f)
-            items[0].Width = ImMax(items[0].Width - width_excess, width_min);
+            items[0].Width = ImMax(items[0].Width - width_excess, ImMin(items[0].Width, width_min));
         return;
     }
     ImQsort(items, (size_t)count, sizeof(ImGuiShrinkWidthItem), ShrinkWidthItemComparer); // Sort largest first, smallest last.
@@ -9850,7 +9850,7 @@ static void ImGui::TabBarLayout(ImGuiTabBar* tab_bar)
     g.ShrinkWidthBuffer.resize(tab_bar->Tabs.Size);
 
     // Minimum shrink width
-    const float shrink_min_width = (tab_bar->Flags & ImGuiTabBarFlags_FittingPolicyMixed) ? g.Style.TabMinWidthShrink : 1.0f;
+    const float shrink_min_width = (tab_bar->Flags & ImGuiTabBarFlags_FittingPolicyShrink || tab_bar->Flags & ImGuiTabBarFlags_FittingPolicyMixed) ? g.Style.TabMinWidthShrink : 1.0f;
 
     // Compute ideal tabs widths + store them into shrink buffer
     ImGuiTabItem* most_recently_selected_tab = NULL;
@@ -10940,8 +10940,11 @@ void ImGui::TabItemLabelAndCloseButton(ImDrawList* draw_list, const ImRect& bb, 
             text_ellipsis_clip_bb.Max.x -= button_sz * 1.00f;
         }
     }
-    LogSetNextTextDecoration("/", "\\");
-    RenderTextEllipsis(draw_list, text_ellipsis_clip_bb.Min, text_ellipsis_clip_bb.Max, ellipsis_max_x, label, NULL, &label_size);
+    if (label_size.x < g.Style.TabMinWidthShrink || bb.GetWidth() > g.Style.TabMinWidthShrink)
+    {
+        LogSetNextTextDecoration("/", "\\");
+        RenderTextEllipsis(draw_list, text_ellipsis_clip_bb.Min, text_ellipsis_clip_bb.Max, ellipsis_max_x, label, NULL, &label_size);
+    }
 
 #if 0
     if (!is_contents_visible)
