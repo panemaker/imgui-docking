@@ -17232,6 +17232,8 @@ void ImGui::DestroyPlatformWindow(ImGuiViewportP* viewport)
         IMGUI_DEBUG_LOG_VIEWPORT("[viewport] Destroy Platform Window %08X '%s'\n", viewport->ID, viewport->Window ? viewport->Window->Name : "n/a");
         if (g.PlatformIO.Renderer_DestroyWindow)
             g.PlatformIO.Renderer_DestroyWindow(viewport);
+        if (g.PlatformIO.Platform_PreWindowDestruction)
+            g.PlatformIO.Platform_PreWindowDestruction(viewport);
         if (g.PlatformIO.Platform_DestroyWindow)
             g.PlatformIO.Platform_DestroyWindow(viewport);
         IM_ASSERT(viewport->RendererUserData == NULL && viewport->PlatformUserData == NULL);
