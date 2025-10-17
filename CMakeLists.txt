@@ -2,11 +2,9 @@ cmake_minimum_required(VERSION 3.4...3.20 FATAL_ERROR)
 
 project(IMGUI VERSION 3.4.0 LANGUAGES C)
 
-add_library(imgui "${IMGUI_SOURCE_DIR}/backends/imgui_impl_glfw.h"
-                 "${IMGUI_SOURCE_DIR}/backends/imgui_impl_glfw.cpp"
-                 "${IMGUI_SOURCE_DIR}/backends/imgui_impl_opengl3.h"
-                 "${IMGUI_SOURCE_DIR}/backends/imgui_impl_opengl3.cpp"
-                 "${IMGUI_SOURCE_DIR}/backends/imgui_impl_opengl3_loader.h"
+add_library(imgui)
+
+target_sources(imgui PRIVATE
                  "${IMGUI_SOURCE_DIR}/misc/cpp/imgui_stdlib.h"
                  "${IMGUI_SOURCE_DIR}/misc/cpp/imgui_stdlib.cpp"
                  "${IMGUI_SOURCE_DIR}/misc/freetype/imgui_freetype.h"
@@ -27,6 +25,24 @@ add_library(imgui "${IMGUI_SOURCE_DIR}/backends/imgui_impl_glfw.h"
                  "${IMGUI_SOURCE_DIR}/imgui_stacklayout_internal.h"
 )
 
+if(IMGUI_BACKEND_SDL3)
+    target_sources(imgui PRIVATE
+                 "${IMGUI_SOURCE_DIR}/backends/imgui_impl_sdl3.cpp"
+                 "${IMGUI_SOURCE_DIR}/backends/imgui_impl_sdl3.h"
+                 "${IMGUI_SOURCE_DIR}/backends/imgui_impl_sdlgpu3.cpp"
+                 "${IMGUI_SOURCE_DIR}/backends/imgui_impl_sdlgpu3.h"
+                 "${IMGUI_SOURCE_DIR}/backends/imgui_impl_sdlgpu3_shaders.h"
+    )
+elseif(IMGUI_BACKEND_GLFW)
+    target_sources(imgui PRIVATE
+                 "${IMGUI_SOURCE_DIR}/backends/imgui_impl_glfw.h"
+                 "${IMGUI_SOURCE_DIR}/backends/imgui_impl_glfw.cpp"
+                 "${IMGUI_SOURCE_DIR}/backends/imgui_impl_opengl3.h"
+                 "${IMGUI_SOURCE_DIR}/backends/imgui_impl_opengl3.cpp"
+                 "${IMGUI_SOURCE_DIR}/backends/imgui_impl_opengl3_loader.h"
+    )
+endif()
+
 set(includes
     "${CMAKE_CURRENT_SOURCE_DIR}"
     "${CMAKE_CURRENT_SOURCE_DIR}/backends"
@@ -35,5 +51,5 @@ set(includes
     "${CMAKE_SOURCE_DIR}/external/freetype/include"
 )
 
-target_link_libraries(imgui PRIVATE glfw)
+target_link_libraries(imgui PRIVATE SDL3::SDL3)
 target_include_directories(imgui PUBLIC ${includes} )
